@@ -1,32 +1,83 @@
 import { Bike, Cloud, Gauge, Heart, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 
-import { motion } from "framer-motion";
+const loadingMessages = [
+  "Vrooom! Calculating...",
+  "Revving up the price engine...",
+  "Analyzing market trends...",
+  "Checking similar listings...",
+  "Computing depreciation...",
+  "Evaluating condition...",
+  "Almost there...",
+  "Finalizing prediction...",
+];
+
+const timeoutMessages = [
+  "Our AI is taking a coffee break",
+  "The motorcycle is stuck in traffic",
+  "Our servers are having a nap",
+  "The prediction engine needs a tune-up",
+  "Our AI is practicing wheelies",
+  "The price calculator is doing yoga",
+  "Our servers are playing hide and seek",
+  "The motorcycle is refueling",
+];
 
 export default function LoadingAnimation() {
-  return (
-    <div className='fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50'>
-      <div className='bg-white/90 p-8 rounded-2xl shadow-lg border border-blue-100'>
-        <div className='flex flex-col items-center gap-4'>
-          <div className='relative'>
-            {/* Main motorcycle doing a wheelie */}
-            <motion.div
-              animate={{
-                rotate: [-10, 15, -10],
-                y: [0, -5, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className='relative'>
-              <Bike
-                className='w-12 h-12 text-blue-600 transform -rotate-12'
-                strokeWidth={1.5}
-              />
-            </motion.div>
+  const [messageIndex, setMessageIndex] = useState(0);
+  const [isTimeout, setIsTimeout] = useState(false);
+  const [timeoutMessageIndex, setTimeoutMessageIndex] = useState(0);
 
-            {/* Floating hearts */}
+  useEffect(() => {
+    const messageInterval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+    }, 3500);
+
+    const timeoutId = setTimeout(() => {
+      setIsTimeout(true);
+      const timeoutInterval = setInterval(() => {
+        setTimeoutMessageIndex((prev) => (prev + 1) % timeoutMessages.length);
+      }, 3500);
+
+      return () => clearInterval(timeoutInterval);
+    }, 30000);
+
+    return () => {
+      clearInterval(messageInterval);
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  return (
+    <div className='fixed inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-50'>
+      <div className='flex flex-col items-center gap-8'>
+        {/* Animated Background Elements */}
+        <div className='absolute inset-0 overflow-hidden'>
+          <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.05),transparent)]' />
+          <div className='absolute inset-0 bg-[linear-gradient(to_right,#4f46e5_1px,transparent_1px),linear-gradient(to_bottom,#4f46e5_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-[0.02]' />
+        </div>
+
+        {/* Main Content */}
+        <div className='relative'>
+          {/* Motorcycle Animation */}
+          <motion.div
+            animate={{
+              rotate: [-10, 15, -10],
+              y: [0, -5, 0],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className='relative'>
+            <Bike
+              className='w-16 h-16 text-blue-600 transform -rotate-12'
+              strokeWidth={1.5}
+            />
+
+            {/* Decorative Elements */}
             <motion.div
               animate={{
                 y: [-20, -30, -20],
@@ -40,13 +91,12 @@ export default function LoadingAnimation() {
               }}
               className='absolute -top-2 -right-2'>
               <Heart
-                className='w-4 h-4 text-pink-400'
+                className='w-5 h-5 text-pink-400'
                 strokeWidth={1.5}
                 fill='currentColor'
               />
             </motion.div>
 
-            {/* Speed gauge */}
             <motion.div
               animate={{
                 rotate: [0, 180, 360],
@@ -58,10 +108,9 @@ export default function LoadingAnimation() {
                 ease: "linear",
               }}
               className='absolute -top-3 -left-3'>
-              <Gauge className='w-5 h-5 text-blue-500' strokeWidth={1.5} />
+              <Gauge className='w-6 h-6 text-blue-500' strokeWidth={1.5} />
             </motion.div>
 
-            {/* Dust clouds */}
             <motion.div
               animate={{
                 x: [-10, -20],
@@ -74,10 +123,9 @@ export default function LoadingAnimation() {
                 ease: "easeOut",
               }}
               className='absolute bottom-0 -left-6'>
-              <Cloud className='w-5 h-5 text-gray-400/70' strokeWidth={1.5} />
+              <Cloud className='w-6 h-6 text-gray-400/70' strokeWidth={1.5} />
             </motion.div>
 
-            {/* Speed lines */}
             <motion.div
               animate={{
                 x: [0, -30],
@@ -94,7 +142,6 @@ export default function LoadingAnimation() {
               <div className='h-[2px] w-3 bg-blue-400/60 rounded-full' />
             </motion.div>
 
-            {/* Engine sparkles */}
             <motion.div
               animate={{
                 scale: [0.8, 1.2, 0.8],
@@ -106,18 +153,38 @@ export default function LoadingAnimation() {
                 ease: "easeInOut",
               }}
               className='absolute -bottom-1 left-1/2'>
-              <Sparkles className='w-4 h-4 text-yellow-400' strokeWidth={1.5} />
+              <Sparkles className='w-5 h-5 text-yellow-400' strokeWidth={1.5} />
             </motion.div>
-          </div>
+          </motion.div>
+        </div>
 
-          <div className='space-y-1 text-center'>
-            <p className='text-sm font-medium text-blue-950'>
-              Vrooom! Calculating...
-            </p>
-            <p className='text-xs text-blue-600/70'>
-              Revving up the price engine 🏍️
-            </p>
-          </div>
+        {/* Text Content */}
+        <div className='space-y-2 text-center'>
+          <AnimatePresence mode='wait'>
+            <motion.p
+              key={
+                isTimeout
+                  ? `timeout-${timeoutMessageIndex}`
+                  : `loading-${messageIndex}`
+              }
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{
+                duration: 0.8,
+                ease: "easeInOut",
+              }}
+              className='text-base font-medium text-blue-950 min-h-[24px]'>
+              {isTimeout
+                ? timeoutMessages[timeoutMessageIndex]
+                : loadingMessages[messageIndex]}
+            </motion.p>
+          </AnimatePresence>
+          <p className='text-sm text-blue-600/70'>
+            {isTimeout
+              ? "We're still working on it, promise!"
+              : "Please wait while we process your request"}
+          </p>
         </div>
       </div>
     </div>

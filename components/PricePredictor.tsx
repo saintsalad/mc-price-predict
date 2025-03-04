@@ -19,8 +19,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import LoadingAnimation from "@/components/loading-animation";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Brain, Sparkles, Gauge } from "lucide-react";
 import SpecificationsContainer from "@/components/SpecificationsContainer";
+import { useRouter } from "next/navigation";
 
 interface PredictionResult {
   confidence: string;
@@ -48,6 +49,7 @@ export default function PricePredictor() {
     otherIssues: "",
   });
   const [isCalculating, setIsCalculating] = useState(false);
+  const router = useRouter();
 
   const modelOptions = selectedBrand
     ? motorcycleBrands.find((brand) => brand.name === selectedBrand)?.models ||
@@ -147,8 +149,42 @@ export default function PricePredictor() {
       }
 
       const result = await response.json();
-      setPredictionResult(result);
-      toast.success("Price prediction calculated successfully!");
+
+      // Store the result data in localStorage
+      const resultData = {
+        id: Date.now().toString(), // Generate a unique ID
+        brand: selectedBrand,
+        model: selectedModel,
+        confidence: result.confidence,
+        pricePredicted: result.pricePredicted,
+        description: result.description,
+        ml_price: result.ml_price,
+        gpt_price: result.gpt_price,
+        heuristic_price: result.heuristic_price,
+        specifications: {
+          category: modelDetails.category,
+          displacement: modelDetails.displacement,
+          transmission: modelDetails.transmission,
+          yearRange: modelDetails.yearRange,
+          priceRange: modelDetails.priceRange,
+        },
+        condition: {
+          year: parseInt(formData.year),
+          mileage: parseInt(formData.mileage.toString()),
+          sellerType: formData.sellerType,
+          owner: formData.owner,
+          knownIssues: formData.knownIssues.join(", "),
+        },
+      };
+
+      // Store in localStorage
+      localStorage.setItem(
+        `prediction_${resultData.id}`,
+        JSON.stringify(resultData)
+      );
+
+      // Navigate to result page
+      router.push(`/result/${resultData.id}`);
     } catch (error) {
       console.error("Error calculating price:", error);
       if (error instanceof TypeError && error.message === "Failed to fetch") {
@@ -193,8 +229,20 @@ export default function PricePredictor() {
 
   return (
     <div className='space-y-6'>
-      <Card className='border border-blue-100 shadow-sm bg-white'>
-        <CardContent className='p-6 space-y-8'>
+      <Card className='border border-blue-100 shadow-sm bg-white relative overflow-hidden'>
+        {/* Background Elements */}
+        <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.05),transparent)]' />
+        <div className='absolute inset-0 bg-[linear-gradient(to_right,#4f46e5_1px,transparent_1px),linear-gradient(to_bottom,#4f46e5_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-[0.02]' />
+
+        <CardContent className='p-6 space-y-8 relative z-10'>
+          {/* Header */}
+          <div className='flex items-center gap-2 mb-2'>
+            <Brain className='w-5 h-5 text-blue-600' />
+            <span className='text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full'>
+              AI Price Predictor
+            </span>
+          </div>
+
           {/* Brand and Model Selection - Horizontal */}
           <div className='grid grid-cols-2 gap-4'>
             <div className='space-y-1.5'>
@@ -299,11 +347,18 @@ export default function PricePredictor() {
             </div>
           </div>
 
-          {/* Mileage Slider */}
-          <div className='space-y-1.5'>
-            <label className='text-xs font-medium text-blue-800'>
-              Mileage (km)
-            </label>
+          {/* Mileage Slider - Simplified Design */}
+          <div className='space-y-3'>
+            <div className='flex items-center justify-between'>
+              <label className='text-xs font-medium text-blue-800 flex items-center gap-2'>
+                <Gauge className='w-4 h-4 text-blue-600' />
+                Mileage
+              </label>
+              <span className='text-sm font-medium text-blue-700 bg-blue-50 px-3 py-1 rounded-full'>
+                {formData.mileage.toLocaleString()} km
+              </span>
+            </div>
+
             <div className='space-y-2'>
               <Slider
                 value={[formData.mileage]}
@@ -314,9 +369,10 @@ export default function PricePredictor() {
                 step={100}
                 className='w-full'
               />
-              <p className='text-xs text-blue-600/70 text-right'>
-                {formData.mileage.toLocaleString()} km
-              </p>
+              <div className='flex justify-between text-xs text-blue-600/70'>
+                <span>0 km</span>
+                <span>100,000 km</span>
+              </div>
             </div>
           </div>
 
@@ -377,7 +433,8 @@ export default function PricePredictor() {
               type='button'
               onClick={handleSubmit}
               disabled={isCalculating}
-              className='flex-1 bg-blue-600 text-white text-sm h-10 rounded-md hover:bg-blue-700 transition-colors font-medium shadow-sm disabled:opacity-50'>
+              className='flex-1 bg-blue-600 text-white text-sm h-10 rounded-md hover:bg-blue-700 transition-colors font-medium shadow-sm disabled:opacity-50 flex items-center justify-center gap-2'>
+              <Sparkles className='w-4 h-4' />
               Calculate Price Estimate
             </button>
           </div>
@@ -392,8 +449,11 @@ export default function PricePredictor() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}>
-            <Card className='border border-blue-300 shadow-md bg-gradient-to-br from-blue-50 to-white'>
-              <CardContent className='p-6'>
+            <Card className='border border-blue-300 shadow-md bg-gradient-to-br from-blue-50 to-white relative overflow-hidden'>
+              {/* Background Elements */}
+              <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent)]' />
+
+              <CardContent className='p-6 relative z-10'>
                 <div className='flex items-start justify-between mb-6'>
                   <div className='space-y-1'>
                     <h3 className='text-lg font-semibold text-blue-950'>
@@ -425,7 +485,12 @@ export default function PricePredictor() {
         )}
       </AnimatePresence>
 
-      {isCalculating && <LoadingAnimation />}
+      {/* Loading State */}
+      {isCalculating && (
+        <div className='fixed inset-0 flex items-center justify-center bg-white/80 backdrop-blur-sm z-50'>
+          <LoadingAnimation />
+        </div>
+      )}
     </div>
   );
 }
