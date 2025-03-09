@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-const API_BASE_URL = "http://127.0.0.1:8000";
+import { API_CONFIG } from "@/lib/config";
 
 export interface PriceRange {
   min: number;
@@ -33,24 +32,27 @@ export interface TrainingRecord {
   created_at?: string;
 }
 
-async function fetchTrainingRecords(): Promise<TrainingRecord[]> {
-  const response = await fetch(`${API_BASE_URL}/api/training`);
+const fetchTrainingRecords = async (): Promise<TrainingRecord[]> => {
+  const response = await fetch(`${API_CONFIG.baseUrl}/api/training`);
   if (!response.ok) {
     throw new Error("Failed to fetch training records");
   }
   return response.json();
-}
+};
 
 async function updateTrainingRecord(
   record: TrainingRecord
 ): Promise<TrainingRecord> {
-  const response = await fetch(`${API_BASE_URL}/api/training/${record.id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(record),
-  });
+  const response = await fetch(
+    `${API_CONFIG.baseUrl}/api/training/${record.id}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(record),
+    }
+  );
   if (!response.ok) {
     throw new Error("Failed to update training record");
   }
@@ -58,7 +60,7 @@ async function updateTrainingRecord(
 }
 
 async function deleteTrainingRecord(id: number): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/api/training/${id}`, {
+  const response = await fetch(`${API_CONFIG.baseUrl}/api/training/${id}`, {
     method: "DELETE",
   });
   if (!response.ok) {

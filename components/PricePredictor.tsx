@@ -22,6 +22,7 @@ import LoadingAnimation from "@/components/loading-animation";
 import { CheckCircle, Brain, Sparkles, Gauge } from "lucide-react";
 import SpecificationsContainer from "@/components/SpecificationsContainer";
 import { useRouter } from "next/navigation";
+import { API_CONFIG } from "@/lib/config";
 
 interface PredictionResult {
   confidence: string;
@@ -113,14 +114,12 @@ export default function PricePredictor() {
       .join(", ");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/predict", {
+      const response = await fetch(`${API_CONFIG.baseUrl}/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        mode: "cors",
-        credentials: "include",
         body: JSON.stringify({
           brand: selectedBrand,
           model: selectedModel,
