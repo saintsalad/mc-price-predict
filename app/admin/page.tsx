@@ -33,6 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal } from "lucide-react";
+import { Highlight, themes } from "prism-react-renderer";
 
 // Form Schema
 const formSchema = z.object({
@@ -66,6 +67,10 @@ export default function AdminPage() {
   >();
   const { records, isLoading, updateRecord, deleteRecord } =
     useTrainingRecords();
+  const [isJsonViewOpen, setIsJsonViewOpen] = useState(false);
+  const [selectedJsonRecord, setSelectedJsonRecord] = useState<
+    TrainingRecord | undefined
+  >();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -81,8 +86,12 @@ export default function AdminPage() {
       header: "Model",
     },
     {
-      accessorKey: "specifications.category",
-      header: "Category",
+      accessorKey: "condition.mileage",
+      header: "Mileage",
+      cell: ({ row }) => {
+        const mileage = row.original.condition.mileage;
+        return mileage ? `${mileage.toLocaleString()} km` : "-";
+      },
     },
     {
       accessorKey: "specifications.displacement",
@@ -127,6 +136,9 @@ export default function AdminPage() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
+            <DropdownMenuItem onClick={() => handleViewJson(row.original)}>
+              View JSON
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleEdit(row.original)}>
               Edit
             </DropdownMenuItem>
@@ -185,6 +197,11 @@ export default function AdminPage() {
     setIsOpen(false);
     setSelectedRecord(undefined);
     form.reset();
+  };
+
+  const handleViewJson = (record: TrainingRecord) => {
+    setSelectedJsonRecord(record);
+    setIsJsonViewOpen(true);
   };
 
   if (isLoading) {
@@ -405,6 +422,34 @@ export default function AdminPage() {
               <Button type='submit'>Update Record</Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isJsonViewOpen} onOpenChange={setIsJsonViewOpen}>
+        <DialogContent className='max-w-xl sm:max-w-2xl'>
+          <DialogHeader>
+            <DialogTitle>Record JSON Data</DialogTitle>
+          </DialogHeader>
+          <div className='bg-muted rounded-md overflow-auto max-h-[50vh]'>
+            <Highlight
+              theme={themes.vsDark}
+              code={JSON.stringify(selectedJsonRecord, null, 2)}
+              language='json'>
+              {({ className, style, tokens, getLineProps, getTokenProps }) => (
+                <pre
+                  className={className + " p-4 text-xs sm:text-sm"}
+                  style={style}>
+                  {tokens.map((line, i) => (
+                    <div key={i} {...getLineProps({ line })}>
+                      {line.map((token, key) => (
+                        <span key={key} {...getTokenProps({ token })} />
+                      ))}
+                    </div>
+                  ))}
+                </pre>
+              )}
+            </Highlight>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

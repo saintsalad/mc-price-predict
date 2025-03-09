@@ -14,7 +14,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -23,6 +22,17 @@ import { CheckCircle, Brain, Sparkles, Gauge } from "lucide-react";
 import SpecificationsContainer from "@/components/SpecificationsContainer";
 import { useRouter } from "next/navigation";
 import { API_CONFIG } from "@/lib/config";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  commonIssues,
+  issueDescriptions,
+  type IssueType,
+} from "@/constants/motorcycleIssues";
 
 interface PredictionResult {
   confidence: string;
@@ -46,8 +56,7 @@ export default function PricePredictor() {
     mileage: 0,
     sellerType: "",
     owner: "",
-    knownIssues: [] as string[],
-    otherIssues: "",
+    knownIssues: [] as IssueType[],
   });
   const [isCalculating, setIsCalculating] = useState(false);
   const router = useRouter();
@@ -56,19 +65,6 @@ export default function PricePredictor() {
     ? motorcycleBrands.find((brand) => brand.name === selectedBrand)?.models ||
       []
     : [];
-
-  const commonIssues = [
-    "Engine knocking",
-    "Oil leaks",
-    "Chain issues",
-    "Electrical problems",
-    "Transmission problems",
-    "Brake issues",
-    "Suspension issues",
-    "Starting problems",
-    "Exhaust system issues",
-    "Fuel system problems",
-  ];
 
   useEffect(() => {
     if (selectedBrand && selectedModel) {
@@ -108,10 +104,7 @@ export default function PricePredictor() {
     setIsCalculating(true);
     setPredictionResult(null);
 
-    const knownIssuesString = formData.knownIssues
-      .filter((issue) => issue !== "Other")
-      .concat(formData.otherIssues ? [formData.otherIssues] : [])
-      .join(", ");
+    const knownIssuesString = formData.knownIssues.join(", ");
 
     try {
       const response = await fetch(`${API_CONFIG.baseUrl}/predict`, {
@@ -213,11 +206,10 @@ export default function PricePredictor() {
       sellerType: "",
       owner: "",
       knownIssues: [],
-      otherIssues: "",
     });
   };
 
-  const handleIssueToggle = (issue: string) => {
+  const handleIssueToggle = (issue: IssueType) => {
     setFormData((prev) => ({
       ...prev,
       knownIssues: prev.knownIssues.includes(issue)
@@ -364,13 +356,13 @@ export default function PricePredictor() {
                 onValueChange={([value]) =>
                   setFormData((prev) => ({ ...prev, mileage: value }))
                 }
-                max={100000}
+                max={200000}
                 step={100}
                 className='w-full'
               />
               <div className='flex justify-between text-xs text-blue-600/70'>
                 <span>0 km</span>
-                <span>100,000 km</span>
+                <span>200,000 km</span>
               </div>
             </div>
           </div>
@@ -381,42 +373,43 @@ export default function PricePredictor() {
               Known Issues
             </label>
             <div className='flex flex-wrap gap-2'>
-              {commonIssues.slice(0, -1).map((issue) => (
-                <button
-                  key={issue}
-                  type='button'
-                  onClick={() => handleIssueToggle(issue)}
-                  className={`text-sm px-3 py-1 rounded-full transition-colors ${
-                    formData.knownIssues.includes(issue)
-                      ? "bg-blue-50 border-blue-200 text-blue-700"
-                      : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                  }`}>
-                  {issue}
-                </button>
-              ))}
-              <button
-                type='button'
-                onClick={() => handleIssueToggle("Other")}
-                className={`text-sm px-3 py-1 rounded-full transition-colors ${
-                  formData.knownIssues.includes("Other")
-                    ? "bg-blue-50 border-blue-200 text-blue-700"
-                    : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                }`}>
-                Other
-              </button>
+              <TooltipProvider>
+                {commonIssues.map((issue) => (
+                  <Tooltip key={issue}>
+                    <TooltipTrigger asChild>
+                      <button
+                        type='button'
+                        onClick={() => handleIssueToggle(issue as IssueType)}
+                        className={`text-sm px-3 py-1 rounded-full transition-colors ${
+                          formData.knownIssues.includes(issue)
+                            ? "bg-blue-50 border-blue-200 text-blue-700"
+                            : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                        }`}>
+                        {issue}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side='top'
+                      align='center'
+                      sideOffset={5}
+                      className='bg-white/95 backdrop-blur-sm px-4 py-3 text-sm max-w-[250px] shadow-lg rounded-xl border border-blue-100/50 animate-in fade-in-0 zoom-in-95 duration-200'>
+                      <div className='flex flex-col gap-1.5'>
+                        <div className='font-semibold text-blue-800/90'>
+                          {issue}
+                        </div>
+                        <div className='text-blue-600/90 leading-relaxed'>
+                          {
+                            issueDescriptions[
+                              issue as keyof typeof issueDescriptions
+                            ]
+                          }
+                        </div>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </TooltipProvider>
             </div>
-
-            {formData.knownIssues.includes("Other") && (
-              <div className='space-y-1.5'>
-                <Textarea
-                  placeholder='Describe other issues...'
-                  name='otherIssues'
-                  value={formData.otherIssues}
-                  onChange={handleInputChange}
-                  className='w-full resize-none text-sm h-20 bg-white border-blue-200'
-                />
-              </div>
-            )}
           </div>
 
           {/* Action Buttons */}
