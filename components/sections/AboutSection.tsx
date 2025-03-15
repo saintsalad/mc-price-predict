@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Brain, BarChart3, Clock } from "lucide-react";
+import { Code, GitBranch, Database } from "lucide-react";
 
 export default function AboutSection() {
   return (
@@ -19,15 +19,16 @@ export default function AboutSection() {
               viewport={{ once: true }}
               className='space-y-4'>
               <div className='w-12 h-12 mx-auto bg-blue-100 rounded-xl flex items-center justify-center'>
-                <Brain className='w-6 h-6 text-blue-600' />
+                <GitBranch className='w-6 h-6 text-blue-600' />
               </div>
               <h2 className='text-3xl font-semibold text-blue-950'>
-                About MotorPrice
+                The Science Behind Moto Price Predictor
               </h2>
               <p className='text-lg text-blue-600/70 max-w-2xl mx-auto'>
-                We combine advanced AI technology with extensive motorcycle
-                market data to provide you with accurate and reliable price
-                predictions for your motorcycle.
+                Built using Python&apos;s powerful machine learning libraries
+                and trained on the Random Forest algorithm, our system navigates
+                through thousands of data points to uncover the hidden patterns
+                that influence motorcycle values.
               </p>
             </motion.div>
 
@@ -38,25 +39,40 @@ export default function AboutSection() {
               viewport={{ once: true }}
               className='grid md:grid-cols-3 gap-8 mt-12'>
               <div className='space-y-2'>
-                <div className='flex items-center justify-center gap-2 text-blue-600'>
-                  <BarChart3 className='w-5 h-5' />
-                  <div className='text-3xl font-bold'>10K+</div>
+                <div className='w-10 h-10 mx-auto bg-blue-100 rounded-xl flex items-center justify-center'>
+                  <GitBranch className='w-5 h-5 text-blue-600' />
                 </div>
-                <div className='text-sm text-blue-950'>Predictions Made</div>
+                <div className='text-blue-950 font-medium'>
+                  Random Forest Algorithm
+                </div>
+                <div className='text-sm text-blue-600/70'>
+                  Our ML model examines thousands of decision trees to identify
+                  value patterns invisible to human analysis
+                </div>
               </div>
               <div className='space-y-2'>
-                <div className='flex items-center justify-center gap-2 text-blue-600'>
-                  <Brain className='w-5 h-5' />
-                  <div className='text-3xl font-bold'>95%</div>
+                <div className='w-10 h-10 mx-auto bg-blue-100 rounded-xl flex items-center justify-center'>
+                  <Code className='w-5 h-5 text-blue-600' />
                 </div>
-                <div className='text-sm text-blue-950'>Accuracy Rate</div>
+                <div className='text-blue-950 font-medium'>
+                  Python-Powered Backend
+                </div>
+                <div className='text-sm text-blue-600/70'>
+                  Developed with scikit-learn and pandas to process complex
+                  motorcycle data relationships
+                </div>
               </div>
               <div className='space-y-2'>
-                <div className='flex items-center justify-center gap-2 text-blue-600'>
-                  <Clock className='w-5 h-5' />
-                  <div className='text-3xl font-bold'>24/7</div>
+                <div className='w-10 h-10 mx-auto bg-blue-100 rounded-xl flex items-center justify-center'>
+                  <Database className='w-5 h-5 text-blue-600' />
                 </div>
-                <div className='text-sm text-blue-950'>Available</div>
+                <div className='text-blue-950 font-medium'>
+                  Philippine Market Focus
+                </div>
+                <div className='text-sm text-blue-600/70'>
+                  Trained specifically on local motorcycle data to reflect
+                  unique market conditions
+                </div>
               </div>
             </motion.div>
 
@@ -67,10 +83,14 @@ export default function AboutSection() {
               viewport={{ once: true }}
               className='mt-12 p-6 bg-gradient-to-br from-blue-50 to-white rounded-xl border border-blue-100'>
               <p className='text-sm text-blue-600/70'>
-                Our AI model continuously learns from market trends and user
-                feedback to provide increasingly accurate predictions. We use a
-                combination of machine learning algorithms and real-time market
-                data to ensure reliable results.
+                Ever wondered how a machine can understand motorcycle values?
+                Moto Price Predictor&apos;s Random Forest algorithm works by
+                creating thousands of decision trees – each analyzing different
+                aspects of your motorcycle. These trees &quot;vote&quot; on the
+                most likely price range, considering factors that even
+                experienced dealers might overlook. The result is a fascinating
+                glimpse into how data science can illuminate market dynamics in
+                ways traditional methods cannot.
               </p>
             </motion.div>
           </div>

@@ -2,35 +2,26 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const pathname = usePathname();
-  const router = useRouter();
-  const isResultPage = pathname?.startsWith("/result");
 
-  const handleClick = async (
+  // Navigation helper that works from any page
+  const handleScrollToAnchor = (
     e: React.MouseEvent<HTMLAnchorElement>,
-    targetId: string
+    anchorId: string
   ) => {
     e.preventDefault();
 
-    if (isResultPage) {
-      // First navigate to home page
-      await router.push("/");
-      // Wait for navigation to complete
-      setTimeout(() => {
-        const elem = document.getElementById(targetId);
-        elem?.scrollIntoView({
-          behavior: "smooth",
-        });
-      }, 100);
-    } else {
-      // Just scroll if we're already on home page
-      const elem = document.getElementById(targetId);
-      elem?.scrollIntoView({
+    // If we're already on the homepage, just scroll
+    if (pathname === "/" || pathname === "") {
+      document.getElementById(anchorId)?.scrollIntoView({
         behavior: "smooth",
       });
+    } else {
+      // Otherwise, navigate to homepage with the hash
+      window.location.href = `/#${anchorId}`;
     }
   };
 
@@ -43,15 +34,12 @@ export default function Header() {
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className='flex items-center space-x-2'>
-            <Link
-              href='/#hero'
-              onClick={(e) => handleClick(e, "hero")}
-              className='flex items-center space-x-2'>
+            <Link href='/' className='flex items-center space-x-2'>
               <div className='flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600 text-white font-bold'>
                 MP
               </div>
               <span className='text-lg font-semibold text-blue-950'>
-                MotorPrice
+                Moto Price Predictor
               </span>
             </Link>
           </motion.div>
@@ -59,20 +47,20 @@ export default function Header() {
           {/* Navigation */}
           <nav className='flex items-center space-x-8'>
             <Link
-              href='/#hero'
-              onClick={(e) => handleClick(e, "hero")}
+              href='/'
+              onClick={(e) => handleScrollToAnchor(e, "hero")}
               className='text-sm font-medium text-blue-950 hover:text-blue-600 transition-colors'>
               Home
             </Link>
             <Link
               href='/#how-it-works'
-              onClick={(e) => handleClick(e, "how-it-works")}
+              onClick={(e) => handleScrollToAnchor(e, "how-it-works")}
               className='text-sm font-medium text-blue-950 hover:text-blue-600 transition-colors'>
               How It Works
             </Link>
             <Link
               href='/#about'
-              onClick={(e) => handleClick(e, "about")}
+              onClick={(e) => handleScrollToAnchor(e, "about")}
               className='text-sm font-medium text-blue-950 hover:text-blue-600 transition-colors'>
               About
             </Link>

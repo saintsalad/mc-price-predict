@@ -23,15 +23,15 @@ export default function HowItWorksSection() {
             <div className='flex items-center justify-center gap-2'>
               <Sparkles className='w-5 h-5 text-blue-500' />
               <span className='text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full'>
-                AI-Powered Process
+                ML-Powered Process
               </span>
             </div>
             <h2 className='text-3xl font-semibold text-blue-950'>
               How It Works
             </h2>
             <p className='text-blue-600/70 max-w-2xl mx-auto'>
-              Our advanced AI system analyzes your motorcycle details to provide
-              accurate price predictions in seconds
+              Our advanced machine learning system analyzes your motorcycle
+              details to provide accurate price predictions in seconds
             </p>
           </motion.div>
 
@@ -81,9 +81,10 @@ export default function HowItWorksSection() {
                       Step 2
                     </span>
                   </div>
-                  <h3 className='font-medium text-blue-950'>AI Analysis</h3>
+                  <h3 className='font-medium text-blue-950'>ML Analysis</h3>
                   <p className='text-sm text-blue-600/70'>
-                    Our AI model analyzes market data and current trends
+                    Our machine learning model analyzes market data and current
+                    trends
                   </p>
                 </div>
               </div>
@@ -125,7 +126,7 @@ export default function HowItWorksSection() {
             className='mt-12 p-6 bg-gradient-to-br from-blue-50 to-white rounded-xl border border-blue-100'>
             <div className='flex items-center gap-3 mb-2'>
               <Brain className='w-5 h-5 text-blue-600' />
-              <h4 className='font-medium text-blue-950'>AI-Powered Insights</h4>
+              <h4 className='font-medium text-blue-950'>ML-Powered Insights</h4>
             </div>
             <p className='text-sm text-blue-600/70'>
               Our system uses advanced machine learning algorithms to analyze
