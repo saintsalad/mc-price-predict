@@ -24,6 +24,7 @@ import {
   MotorcycleModel,
   PredictionResult,
 } from "@/interfaces/motorcycle";
+import { Button } from "@/components/ui/button";
 
 export default function PricePredictor() {
   const [selectedBrand, setSelectedBrand] = useState<string>("");
@@ -233,8 +234,8 @@ export default function PricePredictor() {
             </span>
           </div>
 
-          {/* Brand and Model Selection - Horizontal */}
-          <div className='grid grid-cols-2 gap-4'>
+          {/* Brand and Model Selection - Responsive */}
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4'>
             <div className='space-y-1.5'>
               <label className='text-xs font-medium text-blue-800'>Brand</label>
               <Select
@@ -284,8 +285,8 @@ export default function PricePredictor() {
             />
           )}
 
-          {/* Basic Details */}
-          <div className='grid grid-cols-3 gap-4'>
+          {/* Basic Details - Responsive */}
+          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4'>
             <div className='space-y-1.5'>
               <label className='text-xs font-medium text-blue-800'>Year</label>
               <Select
@@ -378,13 +379,13 @@ export default function PricePredictor() {
                 onValueChange={([value]) =>
                   setFormData((prev) => ({ ...prev, mileage: value }))
                 }
-                max={200000}
+                max={150000}
                 step={100}
                 className='w-full'
               />
               <div className='flex justify-between text-xs text-blue-600/70'>
                 <span>0 km</span>
-                <span>200,000 km</span>
+                <span>150,000 km</span>
               </div>
             </div>
           </div>
@@ -492,23 +493,23 @@ export default function PricePredictor() {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className='flex gap-3'>
-            <button
+          {/* Action Buttons - Responsive */}
+          <div className='flex flex-col sm:flex-row gap-3'>
+            <Button
               type='button'
               onClick={handleClear}
               disabled={isCalculating}
-              className='w-32 bg-white text-blue-600 text-sm h-10 rounded-md hover:bg-blue-50 transition-colors font-medium shadow-sm border border-blue-200 disabled:opacity-50'>
+              className='w-full sm:w-32 bg-white text-blue-600 text-sm h-10 rounded-md hover:bg-blue-50 transition-colors font-medium shadow-sm border border-blue-200 disabled:opacity-50'>
               Clear
-            </button>
-            <button
+            </Button>
+            <Button
               type='button'
               onClick={handleSubmit}
               disabled={isCalculating}
-              className='flex-1 bg-blue-600 text-white text-sm h-10 rounded-md hover:bg-blue-700 transition-colors font-medium shadow-sm disabled:opacity-50 flex items-center justify-center gap-2'>
+              className='w-full flex-1 bg-blue-600 text-white text-sm h-10 rounded-md hover:bg-blue-700 transition-colors font-medium shadow-sm disabled:opacity-50 flex items-center justify-center gap-2'>
               <Sparkles className='w-4 h-4' />
               Calculate Price Estimate
-            </button>
+            </Button>
           </div>
         </CardContent>
       </Card>
