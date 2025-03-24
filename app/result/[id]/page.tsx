@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
-  Brain,
-  Sparkles,
+  BarChart2,
+  GitBranch,
   TrendingUp,
-  Shield,
+  Database,
   ArrowLeft,
   CheckCircle,
   AlertCircle,
+  LineChart,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -106,16 +107,17 @@ export default function ResultPage({
             animate={{ opacity: 1, y: 0 }}
             className='text-center space-y-4'>
             <div className='flex items-center justify-center gap-2'>
-              <Brain className='w-5 h-5 text-blue-600' />
+              <BarChart2 className='w-5 h-5 text-blue-600' />
               <span className='text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full'>
-                AI Price Prediction Result
+                Moto Price Predictor Results
               </span>
             </div>
             <h1 className='text-3xl font-bold text-blue-950'>
               {result.brand} {result.model}
             </h1>
             <p className='text-blue-600/70'>
-              Price prediction based on market analysis and AI algorithms
+              Price prediction based on machine learning analysis and market
+              data
             </p>
           </motion.div>
 
@@ -136,9 +138,9 @@ export default function ResultPage({
                         ₱ {result.pricePredicted.toLocaleString() || 0.0}
                       </h2>
                       <div className='flex items-center gap-2'>
-                        <Shield className='w-4 h-4 text-blue-600' />
+                        <GitBranch className='w-4 h-4 text-blue-600' />
                         <span className='text-sm font-medium text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full'>
-                          {result.confidence} Confidence Level
+                          {result.confidence} Model Confidence
                         </span>
                       </div>
                     </div>
@@ -243,8 +245,10 @@ export default function ResultPage({
 
                 <div className='mt-6 pt-4 border-t border-blue-100'>
                   <div className='flex items-center gap-2 mb-3'>
-                    <Brain className='w-4 h-4 text-blue-600' />
-                    <h3 className='font-medium text-blue-950'>AI Analysis</h3>
+                    <LineChart className='w-4 h-4 text-blue-600' />
+                    <h3 className='font-medium text-blue-950'>
+                      Model Analysis
+                    </h3>
                   </div>
                   <div className='bg-blue-50/50 p-3 rounded-lg border border-blue-100'>
                     <div className='space-y-3'>
@@ -280,7 +284,7 @@ export default function ResultPage({
             <Button
               className='bg-blue-600 text-white hover:bg-blue-700'
               onClick={() => router.push("/")}>
-              <Sparkles className='w-4 h-4 mr-2' />
+              <Database className='w-4 h-4 mr-2' />
               Calculate Another Motorcycle
             </Button>
           </motion.div>
