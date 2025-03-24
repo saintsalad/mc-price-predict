@@ -2,10 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Slider } from "@/components/ui/slider";
-import {
-  motorcycleBrands,
-  type MotorcycleModel,
-} from "@/constants/motorcycleBrands";
+import { motorcycleBrands } from "@/constants/motorcycleBrands";
 import {
   Select,
   SelectContent,
@@ -13,24 +10,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import LoadingAnimation from "@/components/loading-animation";
-import { CheckCircle, Brain, Sparkles, Gauge } from "lucide-react";
+import { CheckCircle, Brain, Sparkles, Gauge, Search, X } from "lucide-react";
 import SpecificationsContainer from "@/components/SpecificationsContainer";
 import { useRouter } from "next/navigation";
-
-interface PredictionResult {
-  confidence: string;
-  pricePredicted: number;
-  description: string;
-  ml_price: number;
-  gpt_price: number;
-  heuristic_price: number;
-}
+import { API_CONFIG } from "@/lib/config";
+import {
+  commonIssues,
+  IssueType,
+  MotorcycleModel,
+  PredictionResult,
+} from "@/interfaces/motorcycle";
 
 export default function PricePredictor() {
   const [selectedBrand, setSelectedBrand] = useState<string>("");
@@ -45,29 +38,17 @@ export default function PricePredictor() {
     mileage: 0,
     sellerType: "",
     owner: "",
-    knownIssues: [] as string[],
-    otherIssues: "",
+    knownIssues: [] as IssueType[],
   });
   const [isCalculating, setIsCalculating] = useState(false);
   const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const modelOptions = selectedBrand
     ? motorcycleBrands.find((brand) => brand.name === selectedBrand)?.models ||
       []
     : [];
-
-  const commonIssues = [
-    "Engine knocking",
-    "Oil leaks",
-    "Chain issues",
-    "Electrical problems",
-    "Transmission problems",
-    "Brake issues",
-    "Suspension issues",
-    "Starting problems",
-    "Exhaust system issues",
-    "Fuel system problems",
-  ];
 
   useEffect(() => {
     if (selectedBrand && selectedModel) {
@@ -81,15 +62,30 @@ export default function PricePredictor() {
     }
   }, [selectedBrand, selectedModel]);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest(".issues-dropdown-container")) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // const handleInputChange = (
+  //   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  // ) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     [name]: value,
+  //   }));
+  // };
 
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({
@@ -107,20 +103,15 @@ export default function PricePredictor() {
     setIsCalculating(true);
     setPredictionResult(null);
 
-    const knownIssuesString = formData.knownIssues
-      .filter((issue) => issue !== "Other")
-      .concat(formData.otherIssues ? [formData.otherIssues] : [])
-      .join(", ");
+    const knownIssuesString = formData.knownIssues.join(", ");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/predict", {
+      const response = await fetch(`${API_CONFIG.baseUrl}/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        mode: "cors",
-        credentials: "include",
         body: JSON.stringify({
           brand: selectedBrand,
           model: selectedModel,
@@ -214,11 +205,10 @@ export default function PricePredictor() {
       sellerType: "",
       owner: "",
       knownIssues: [],
-      otherIssues: "",
     });
   };
 
-  const handleIssueToggle = (issue: string) => {
+  const handleIssueToggle = (issue: IssueType) => {
     setFormData((prev) => ({
       ...prev,
       knownIssues: prev.knownIssues.includes(issue)
@@ -239,7 +229,7 @@ export default function PricePredictor() {
           <div className='flex items-center gap-2 mb-2'>
             <Brain className='w-5 h-5 text-blue-600' />
             <span className='text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full'>
-              AI Price Predictor
+              ML Price Predictor
             </span>
           </div>
 
@@ -298,16 +288,39 @@ export default function PricePredictor() {
           <div className='grid grid-cols-3 gap-4'>
             <div className='space-y-1.5'>
               <label className='text-xs font-medium text-blue-800'>Year</label>
-              <Input
-                type='number'
-                placeholder='Enter year'
-                min='1900'
-                max='2024'
-                name='year'
-                value={formData.year}
-                onChange={handleInputChange}
-                className='h-9 text-sm bg-white border-blue-200'
-              />
+              <Select
+                value={formData.year.toString()}
+                onValueChange={(value) => handleSelectChange("year", value)}
+                disabled={!modelDetails}>
+                <SelectTrigger className='h-9 text-sm bg-white border-blue-200'>
+                  <SelectValue
+                    placeholder={
+                      modelDetails ? "Select year" : "Select model first"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {modelDetails &&
+                    modelDetails.yearRange.split("-").length === 2 &&
+                    Array.from(
+                      {
+                        length:
+                          parseInt(modelDetails.yearRange.split("-")[1]) -
+                          parseInt(modelDetails.yearRange.split("-")[0]) +
+                          1,
+                      },
+                      (_, i) => {
+                        const year =
+                          parseInt(modelDetails.yearRange.split("-")[0]) + i;
+                        return (
+                          <SelectItem key={year} value={year.toString()}>
+                            {year}
+                          </SelectItem>
+                        );
+                      }
+                    )}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className='space-y-1.5'>
@@ -323,8 +336,8 @@ export default function PricePredictor() {
                   <SelectValue placeholder='Select type' />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value='individual'>Individual</SelectItem>
-                  <SelectItem value='dealer'>Dealer</SelectItem>
+                  <SelectItem value='Private'>Private</SelectItem>
+                  <SelectItem value='Dealer'>Dealer</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -365,59 +378,118 @@ export default function PricePredictor() {
                 onValueChange={([value]) =>
                   setFormData((prev) => ({ ...prev, mileage: value }))
                 }
-                max={100000}
+                max={200000}
                 step={100}
                 className='w-full'
               />
               <div className='flex justify-between text-xs text-blue-600/70'>
                 <span>0 km</span>
-                <span>100,000 km</span>
+                <span>200,000 km</span>
               </div>
             </div>
           </div>
 
-          {/* Known Issues - Simplified */}
+          {/* Known Issues - Searchable Dropdown & Badges */}
           <div className='space-y-3'>
             <label className='text-xs font-medium text-blue-800'>
               Known Issues
             </label>
-            <div className='flex flex-wrap gap-2'>
-              {commonIssues.slice(0, -1).map((issue) => (
-                <button
-                  key={issue}
-                  type='button'
-                  onClick={() => handleIssueToggle(issue)}
-                  className={`text-sm px-3 py-1 rounded-full transition-colors ${
-                    formData.knownIssues.includes(issue)
-                      ? "bg-blue-50 border-blue-200 text-blue-700"
-                      : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                  }`}>
-                  {issue}
-                </button>
-              ))}
-              <button
-                type='button'
-                onClick={() => handleIssueToggle("Other")}
-                className={`text-sm px-3 py-1 rounded-full transition-colors ${
-                  formData.knownIssues.includes("Other")
-                    ? "bg-blue-50 border-blue-200 text-blue-700"
-                    : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-                }`}>
-                Other
-              </button>
-            </div>
 
-            {formData.knownIssues.includes("Other") && (
-              <div className='space-y-1.5'>
-                <Textarea
-                  placeholder='Describe other issues...'
-                  name='otherIssues'
-                  value={formData.otherIssues}
-                  onChange={handleInputChange}
-                  className='w-full resize-none text-sm h-20 bg-white border-blue-200'
+            <div className='space-y-3'>
+              {/* Searchable Dropdown */}
+              <div className='relative issues-dropdown-container'>
+                <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
+                  <Search className='h-4 w-4 text-blue-500' />
+                </div>
+                <input
+                  type='text'
+                  className='h-9 pl-10 w-full text-sm bg-white border border-blue-200 rounded-md focus:ring-1 focus:ring-blue-300 focus:border-blue-300 outline-none'
+                  placeholder='Search for issues...'
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onFocus={() => setShowDropdown(true)}
                 />
+                {showDropdown && (
+                  <div className='absolute z-10 mt-1 w-full bg-white border border-blue-200 rounded-md shadow-lg max-h-60 overflow-auto'>
+                    <div className='p-1'>
+                      {Object.keys(commonIssues)
+                        .filter((issue) => {
+                          const searchTermLower = searchTerm.toLowerCase();
+                          const titleMatches = issue
+                            .toLowerCase()
+                            .includes(searchTermLower);
+                          const description =
+                            commonIssues[issue as keyof typeof commonIssues];
+                          const descriptionMatches =
+                            typeof description === "string" &&
+                            description.toLowerCase().includes(searchTermLower);
+
+                          return titleMatches || descriptionMatches;
+                        })
+                        .map((issue) => (
+                          <div
+                            key={issue}
+                            className={`px-2 py-1.5 text-sm rounded cursor-pointer hover:bg-blue-50 ${
+                              formData.knownIssues.includes(issue as IssueType)
+                                ? "bg-blue-50 text-blue-700"
+                                : ""
+                            }`}
+                            onClick={() => {
+                              handleIssueToggle(issue as IssueType);
+                              setSearchTerm("");
+                              setShowDropdown(false);
+                            }}>
+                            <div className='flex items-center'>
+                              <span className='mr-2'>
+                                {formData.knownIssues.includes(
+                                  issue as IssueType
+                                ) && (
+                                  <CheckCircle className='h-3.5 w-3.5 text-blue-600' />
+                                )}
+                              </span>
+                              <div>
+                                <div className='font-medium'>{issue}</div>
+                                <div className='text-xs text-gray-500 truncate'>
+                                  {
+                                    commonIssues[
+                                      issue as keyof typeof commonIssues
+                                    ]
+                                  }
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
+
+              {/* Selected Issues as Badges */}
+              {formData.knownIssues.length > 0 && (
+                <div className='flex flex-wrap gap-2 mt-2 p-3 bg-blue-50/30 border border-blue-100 rounded-md'>
+                  {formData.knownIssues.map((issue) => (
+                    <div
+                      key={issue}
+                      className='flex items-center bg-blue-100 text-blue-700 text-xs py-1 pl-2 pr-1 rounded-full group relative'>
+                      <span>{issue}</span>
+                      <button
+                        type='button'
+                        onClick={() => handleIssueToggle(issue)}
+                        className='ml-1 p-0.5 rounded-full hover:bg-blue-200 transition-colors'>
+                        <X className='h-3 w-3' />
+                      </button>
+
+                      {/* Tooltip on hover */}
+                      <div className='absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-white shadow-lg rounded-md border border-blue-100 text-xs text-blue-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10'>
+                        {commonIssues[issue as keyof typeof commonIssues]}
+                        <div className='absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-2 h-2 bg-white border-b border-r border-blue-100 rotate-45'></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Action Buttons */}

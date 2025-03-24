@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowDown, Sparkles } from "lucide-react";
+import { ArrowDown, Cpu } from "lucide-react";
 
 export default function HeroSection() {
   const scrollToSection = (id: string) => {
@@ -19,7 +19,7 @@ export default function HeroSection() {
       <div className='absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-blue-100' />
       <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.8),transparent)]' />
 
-      {/* Animated AI Grid Pattern */}
+      {/* Animated ML Grid Pattern */}
       <div className='absolute inset-0 opacity-[0.03]'>
         <div className='absolute inset-0 bg-[linear-gradient(to_right,#4f46e5_1px,transparent_1px),linear-gradient(to_bottom,#4f46e5_1px,transparent_1px)] bg-[size:4rem_4rem]' />
       </div>
@@ -31,9 +31,9 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className='flex items-center justify-center gap-2 mb-4'>
-            <Sparkles className='w-5 h-5 text-blue-500' />
+            <Cpu className='w-5 h-5 text-blue-500' />
             <span className='text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full'>
-              AI-Powered Predictions
+              Moto Price Predictor
             </span>
           </motion.div>
 
@@ -42,9 +42,9 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             className='text-5xl font-bold text-blue-950 tracking-tight'>
-            Get Accurate Motorcycle{" "}
+            Discover Your Motorcycle&apos;s{" "}
             <span className='bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent'>
-              Price Predictions
+              Hidden Value
             </span>
           </motion.h1>
 
@@ -53,8 +53,8 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
             className='text-xl text-blue-600/70 max-w-2xl mx-auto'>
-            Make informed decisions with our advanced AI-powered motorcycle
-            valuation tool
+            Let our smart ML algorithms crunch the numbers while you sit back
+            and watch the magic happen
           </motion.p>
 
           <motion.div

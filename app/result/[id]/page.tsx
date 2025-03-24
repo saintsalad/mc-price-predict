@@ -133,11 +133,7 @@ export default function ResultPage({
                   <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-3'>
                     <div className='space-y-1.5'>
                       <h2 className='text-2xl font-bold text-blue-700'>
-                        ₱
-                        {result.gpt_price !== null ||
-                        result.gpt_price !== undefined
-                          ? result.gpt_price.toLocaleString()
-                          : result.pricePredicted.toLocaleString()}
+                        ₱ {result.pricePredicted.toLocaleString() || 0.0}
                       </h2>
                       <div className='flex items-center gap-2'>
                         <Shield className='w-4 h-4 text-blue-600' />

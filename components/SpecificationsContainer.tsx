@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
-import { type MotorcycleModel } from "@/constants/motorcycleBrands";
+import { MotorcycleModel } from "@/interfaces/motorcycle";
 
 interface SpecificationsContainerProps {
   modelDetails: MotorcycleModel | null;
